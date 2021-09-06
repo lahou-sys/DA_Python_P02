@@ -1,0 +1,14 @@
+/page-1.html
+
+http://books.toscrape.com/catalogue/category/books/fiction_10/page-5.html   BAD
+
+http://books.toscrape.com/catalogue/category/books/fiction_10/page-3.html
+
+
+https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urljoin
+
+
+https://www.it-swarm-fr.com/fr/python/comment-utiliser-le-threading-en-python/969598257/
+
+
+temps Books to csv : 48 min
