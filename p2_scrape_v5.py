@@ -69,7 +69,7 @@ def make_soup(url):
 
 	"""
     reponse = requests.get(url)
-    soup = BeautifulSoup(reponse.text, "html.parser")
+    soup = BeautifulSoup(reponse.content, "html.parser")
     return soup
 
 
@@ -79,16 +79,9 @@ def dic_categories_url(url):
 
 	"""
     soup = make_soup(url)
-    categories_liste = []
-    categories_liste_url = []
     categorie_side = soup.find("div", class_="side_categories")
     cacategories = categorie_side.findChildren("a")
-    for i in cacategories:
-        item = ((i.contents[0]).rstrip("\n")).strip()
-        categories_liste.append(item)
-        item2 = url_build(url,i)
-        categories_liste_url.append(item2)
-    dic_categories = dict(zip(categories_liste, categories_liste_url))
+    dic_categories = {((i.contents[0]).rstrip("\n")).strip():url_build(url,i) for i in cacategories }
     return dic_categories
 
 
@@ -139,14 +132,6 @@ def extract_attributs_book(soup):
 	"""
     section = soup.find("table", attrs={"class": "table table-striped"})
     tables = section.find_all("tr")
-    """ table_header = []
-    table_data = []
-    for i in tables:
-        header = i.find("th")
-        table_header.append(header.text)
-        data_row = i.find("td")
-        table_data.append(data_row.text)
-    dic_attributs_book = dict(zip(table_header, table_data)) """
     dic_attributs_book = {(i.find("th")).text:(i.find("td")).text for i in tables}
     return dic_attributs_book
 
@@ -191,7 +176,7 @@ def extract_price_including_tax(soup):
 
 	"""
     price_including_tax = extract_attributs_book(soup)['Price (incl. tax)']
-    return price_including_tax.replace("Â", "")
+    return price_including_tax
 
 
 def extract_price_excluding_tax(soup):
@@ -200,7 +185,7 @@ def extract_price_excluding_tax(soup):
 
 	"""
     price_excluding_tax = extract_attributs_book(soup)['Price (excl. tax)']
-    return price_excluding_tax.replace("Â", "")
+    return price_excluding_tax
 
 
 def extract_number_available(soup):
@@ -219,7 +204,7 @@ def extract_product_description(soup):
 	"""
     section = soup.find("div", attrs={"id": "content_inner"})
     if section.find("p", attrs=None):
-        product_description = (section.find("p", attrs=None).text).replace(",", "")
+        product_description = (section.find("p", attrs=None).text)
         return product_description
     else:
         return None
@@ -313,7 +298,6 @@ def export_to_csv(books,categorie):
         books : liste des dictionnaires de chaque livre
 	
 	"""
-    books = books
     header_list = []
     output = categorie.replace(" ", "_") + ".csv"
     for key in books[0]:
@@ -336,7 +320,7 @@ def download_all_pictures(categorie,books):
 	"""
     directory = "images"
     mkdir_directory(directory)
-    # books = books
+    books = books
     liste_books = []
     for i in range(len(books)):
         key_to_extract = {"universal_ product_code (upc)", "image_url"}
@@ -413,7 +397,7 @@ def main(url,categorie):
             books = extract_all_book_of_categorie(categorie,dic_cat)
             export_to_csv(books,categorie)
             download_all_pictures(categorie,books)
-        print("Extraction terminée." + "\nLe dossier " + '"' + directory_root + '"' + " contient votre extraction." )
+        print("Extraction terminée." + "\nLe dossier " + '"' + directory_root + '"' + " contient les fichiers de l'extraction." )
 
 
 # Running the script
@@ -423,7 +407,7 @@ start_time = time.time()
 URL = "http://books.toscrape.com/"
 
 if __name__ == "__main__":
-    main(URL, "ALL")
+    main(URL, "Travel")
 
 
 print("Durée du traitement : --- %s seconds ---" % (time.time() - start_time))
