@@ -2,9 +2,9 @@
 
 Utilisez les bases de Python pour l'analyse de marché
 
-# Table of Contents <a name="Table_of_Contents"></a>
+# Table des matières<a name="Table_of_Contents"></a>
 - [DA_Python_P02 - SCRAPE](#da_python_p02---scrape)
-- [Table of Contents <a name="Table_of_Contents"></a>](#table-of-contents-)
+- [Table des matières<a name="Table_of_Contents"></a>](#table-des-matières)
   - [INTRODUCTION <a name="INTRODUCTION"></a>](#introduction-)
   - [Objectifs du projet <a name="objectifs"></a>](#objectifs-du-projet-)
   - [FEATURES <a name="FEATURES"></a>](#features-)
