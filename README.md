@@ -82,13 +82,13 @@ Si le module python "venv" n'est pas installé sur votre système, il est néces
 $ pip insatll venv
 ```
 
-    - Création de l'environnement virtuel Python
+  - Création de l'environnement virtuel Python
 
 ```ssh
 $ python3 -m venv .venv
 ```
 
-  - Création de l'environnement virtuel Python
+  - Activation de l'environnement virtuel Python
 
 ```ssh
 $ source ./.venv/bin/activate
@@ -98,7 +98,7 @@ $ source ./.venv/bin/activate
 
 ### Installation des packages Python nécessaire <a name="Installation_package"></a>
 
-l'instaation de ces packages sont nécessaire pour la bonne éxécution du script.
+l'installation de ces packages sont nécessaire pour la bonne éxécution du script.
 
 - bs4==0.0.1
 - requests==2.26.0
