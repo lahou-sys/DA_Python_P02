@@ -48,7 +48,7 @@ Il s'agira simplement d'une application exécutable à la demande visant à réc
 [<div align="center">[Table of Contents]</div>](#Table_of_Contents)
 
 ## REQUIREMENTS <a name="REQUIREMENTS"></a>
-  - Pour l'exécution du programme, il est recommandé d'avoir version de Python d'au moins v3.8.X ou plus récente.
+  - Pour l'exécution du programme, une version de Python d'au moins v3.8.X ou plus récente est recommandée.
   - Il est recommandé d'utiliser un environnement virtuel Python et d'installer les packages présents dans le fichier "requirements.txt" (une procédure plus bas vous détaillera cette installation).
   - Il est recommander de récupérer le projet en utilisant "git clone" ou en téléchargeant directement le projet.
   - Une connexion internet fonctionnelle est nécessaire
@@ -78,7 +78,7 @@ Si le module python "venv" n'est pas installé sur votre système, il est néces
   - Installation du module "venv"
 
 ```ssh
-$ pip insatll venv
+$ pip install venv
 ```
 
   - Création de l'environnement virtuel Python
@@ -252,7 +252,7 @@ Les champs suivants sont récupérés :
 
 ## Fichier d'extration "image des livres" <a name="Image_livre"></a>
 
-Les images de chaque livre est téléchargée et rangée par catégorie.
+Les images de chaque livre sont téléchargées et rangées par catégorie.
 
 Les fichiers images sont nommé de cette façon :
 
