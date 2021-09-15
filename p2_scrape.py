@@ -1,26 +1,19 @@
 # -*- coding: utf8 -*-
 
 
-import asyncio
-#from project import app
 import csv
 import math
 import os
 import threading
 import time
 import urllib.request
-#from multiprocessing.dummy import Pool
 from urllib.parse import urljoin
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-
-#from re import T
-#from typing import Text
 import requests
 from bs4 import BeautifulSoup
 
 
-def mkdirDirectory(directory):
+def mkdir_directory(directory):
     os.mkdir(directory)
 
 
@@ -129,7 +122,7 @@ def list_url_book_categorie_pool(url, categorie):
     return book_liste_url
 
 
-def extractAttributsBook(url):
+def extract_attributs_book(url):
     soup = make_soup(url)
     section = soup.find("table", attrs={"class": "table table-striped"})
     tables = section.find_all("tr")
@@ -144,19 +137,19 @@ def extractAttributsBook(url):
     return dic_attributs_book
 
 
-def extractUpc(url):
-    upc = extractAttributsBook(url)['UPC']
+def extract_upc(url):
+    upc = extract_attributs_book(url)['UPC']
     return upc
 
 
-def extractTitle(url):
+def extract_title(url):
     soup = make_soup(url)
     section = soup.find("div", attrs={"class": "col-sm-6 product_main"})
     title = section.find("h1")
     return title.text
 
 
-def extractCategorie(url):
+def extract_categorie(url):
     soup = make_soup(url)
     section = soup.find("div", attrs={"class": "container-fluid page"})
     section_2 = section.find("ul", attrs={"class": "breadcrumb"} )
@@ -168,22 +161,22 @@ def extractCategorie(url):
     return categorie
 
 
-def extractPriceIncludingTax(url):
-    price_including_tax = extractAttributsBook(url)['Price (incl. tax)']
+def extract_price_including_tax(url):
+    price_including_tax = extract_attributs_book(url)['Price (incl. tax)']
     return price_including_tax.replace("Â", "")
 
 
-def extractPriceExcludingTax(url):
-    price_excluding_tax = extractAttributsBook(url)['Price (excl. tax)']
+def extract_price_excluding_tax(url):
+    price_excluding_tax = extract_attributs_book(url)['Price (excl. tax)']
     return price_excluding_tax.replace("Â", "")
 
 
-def extractNumberAvailable(url):
-    number_available = extractAttributsBook(url)['Availability']
+def extract_number_available(url):
+    number_available = extract_attributs_book(url)['Availability']
     return (number_available.replace("In stock (", "")).replace("available)", "")
 
 
-def extractProductDescription(url):
+def extract_product_description(url):
     soup = make_soup(url)
     section = soup.find("div", attrs={"id": "content_inner"})
     if section.find("p", attrs=None):
@@ -193,7 +186,7 @@ def extractProductDescription(url):
         return None
 
 
-def extractReviewRating(url):
+def extract_review_rating(url):
     notes = ("One", "Two", "Three", "Four", "Five" )
     review_rating = "None"
     soup = make_soup(url)
@@ -205,32 +198,32 @@ def extractReviewRating(url):
     return review_rating
 
 
-def extractImageUrl(url):
+def extract_image_url(url):
     soup = make_soup(url)
     section = soup.find("div", attrs={"class": "item active"})
     image_url = section.find("img")["src"]
     return url_src_build(url,image_url)
 
 
-def extractAllBookOfCategorie(url, categorie):
+""" def extract_all_book_of_categorie(url, categorie):
     liste_url_books = list_url_book_categorie(url, categorie)
     liste_books = []
     for i in liste_url_books:
         books = {}
         books["product_page_url"] = i
-        books["universal_ product_code (upc)"] = extractUpc(i)
-        books["title"] = extractTitle(i)
-        books["price_including_taxe"] = extractPriceIncludingTax(i)
-        books["price_excluding_taxe"] = extractPriceExcludingTax(i)
-        books["number_available"] = extractNumberAvailable(i)
-        books["product_description"] = extractProductDescription(i)
-        books["category"] = extractCategorie(i)
-        books["review_rating"] = extractReviewRating(i)
-        books["image_url"] = extractImageUrl(i)   
+        books["universal_ product_code (upc)"] = extract_upc(i)
+        books["title"] = extract_title(i)
+        books["price_including_taxe"] = extract_price_including_tax(i)
+        books["price_excluding_taxe"] = extract_price_excluding_tax(i)
+        books["number_available"] = extract_number_available(i)
+        books["product_description"] = extract_product_description(i)
+        books["category"] = extract_categorie(i)
+        books["review_rating"] = extract_review_rating(i)
+        books["image_url"] = extract_image_url(i)   
         liste_books.append(books)
-    return liste_books
+    return liste_books """
 
-def chunksListe(l, n):
+def chunks_liste(l, n):
     last = 0
     for i in range(1, n+1):
         cur = int(round(i * (len(l) / n)))
@@ -238,44 +231,44 @@ def chunksListe(l, n):
         last = cur
 
 
-def extractInfosBooks(liste_url):
+def extract_infos_books(liste_url):
     i = liste_url
     books = {}
     books["product_page_url"] = i
-    books["universal_ product_code (upc)"] = extractUpc(i)
-    books["title"] = extractTitle(i)
-    books["price_including_taxe"] = extractPriceIncludingTax(i)
-    books["price_excluding_taxe"] = extractPriceExcludingTax(i)
-    books["number_available"] = extractNumberAvailable(i)
-    books["product_description"] = extractProductDescription(i)
-    books["category"] = extractCategorie(i)
-    books["review_rating"] = extractReviewRating(i)
-    books["image_url"] = extractImageUrl(i)
+    books["universal_ product_code (upc)"] = extract_upc(i)
+    books["title"] = extract_title(i)
+    books["price_including_taxe"] = extract_price_including_tax(i)
+    books["price_excluding_taxe"] = extract_price_excluding_tax(i)
+    books["number_available"] = extract_number_available(i)
+    books["product_description"] = extract_product_description(i)
+    books["category"] = extract_categorie(i)
+    books["review_rating"] = extract_review_rating(i)
+    books["image_url"] = extract_image_url(i)
     return books 
         
 
-def extractAllBookOfCategoriePool(url, categorie):
+def extract_all_book_of_categoriePool(url, categorie):
     liste_url_books = list_url_book_categorie(url, categorie)
     nombre_books = len(liste_url_books)
     nombre_max_url = 100
     print(nombre_books)
     taille_sous_liste = math.ceil(nombre_books / nombre_max_url)
     print(taille_sous_liste)
-    liste_url_books_divise = list(chunksListe(liste_url_books, taille_sous_liste))
+    liste_url_books_divise = list(chunks_liste(liste_url_books, taille_sous_liste))
     print(len(liste_url_books_divise))
     liste_books = []
     processes = []
     for i in liste_url_books_divise:
         with ThreadPoolExecutor(max_workers=100) as executor:
             for j in i:
-                result = processes.append(executor.submit(extractInfosBooks, j))          
+                result = processes.append(executor.submit(extract_infos_books, j))          
     for task in as_completed(processes):
         liste_books.append(task.result())
     return liste_books
 
 
-def exportToCsv(url,categorie):
-    books = extractAllBookOfCategoriePool(url, categorie)
+def export_to_csv(url,categorie):
+    books = extract_all_book_of_categoriePool(url, categorie)
     header_list = []
     for key in books[0]:
         header_list.append(key)
@@ -290,15 +283,15 @@ def exportToCsv(url,categorie):
         print("--- %s seconds ---" % (time.time() - start_time))
 
 
-def downloadAllPictures(url,categorie):
+""" def download_all_pictures(url,categorie):
     directory = "pictures_" + categorie +"_"+ time.strftime("%y%m%d%H%M%S")
-    mkdirDirectory(directory)
+    mkdir_directory(directory)
     liste_url_books = list_url_book_categorie(url, categorie)
     liste_books = []
     for i in liste_url_books:
         books = {}
-        books["universal_ product_code (upc)"] = extractUpc(i)
-        books["image_url"] = extractImageUrl(i)   
+        books["universal_ product_code (upc)"] = extract_upc(i)
+        books["image_url"] = extract_image_url(i)   
         liste_books.append(books)
     for j in liste_books:
         liste_item = []
@@ -307,12 +300,12 @@ def downloadAllPictures(url,categorie):
         name_picture = "pictures_" + categorie +"_"+"upc-" + liste_item[0] + ".jpg"
         fullfilename = os.path.join(directory, name_picture)
         urllib.request.urlretrieve(liste_item[1],fullfilename)
+ """
 
-
-def downloadAllPicturesPool(url,categorie):
+""" def download_all_pictures_pool_old(url,categorie):
     directory = "pictures_" + categorie +"_"+ time.strftime("%y%m%d%H%M%S")
-    mkdirDirectory(directory)
-    books = extractAllBookOfCategoriePool(url, categorie)
+    mkdir_directory(directory)
+    books = extract_all_book_of_categoriePool(url, categorie)
     liste_books = []
     for i in range(len(books)):
         key_to_extract = {"universal_ product_code (upc)", "image_url"}
@@ -325,12 +318,12 @@ def downloadAllPicturesPool(url,categorie):
             liste_item.append(value)
         name_picture = "pictures_" + categorie +"_"+"upc-" + liste_item[0] + ".jpg"
         fullfilename = os.path.join(directory, str(name_picture))
-        urllib.request.urlretrieve(liste_item[1],fullfilename)
+        urllib.request.urlretrieve(liste_item[1],fullfilename) """
 
-def downloadAllPicturesPool2(url,categorie):
+def download_all_pictures_pool(url,categorie):
     directory = "pictures_" + categorie +"_"+ time.strftime("%y%m%d%H%M%S")
-    mkdirDirectory(directory)
-    books = extractAllBookOfCategoriePool(url, categorie)
+    mkdir_directory(directory)
+    books = extract_all_book_of_categoriePool(url, categorie)
     liste_books = []
     for i in range(len(books)):
         key_to_extract = {"universal_ product_code (upc)", "image_url"}
@@ -353,14 +346,14 @@ def downloadAllPicturesPool2(url,categorie):
     threads = []
     for i in range(2):
         for u,f in zip(book_url, book_fullfilename):
-            thread = threading.Thread(target=downloadPictureUrlPool, args=(u,f))
+            thread = threading.Thread(target=download_picture_url_pool, args=(u,f))
             threads.append(thread)
             thread.start()
     for i in threads:
         i.join()
     
 
-def downloadPictureUrlPool(url,fullfilename):
+def download_picture_url_pool(url,fullfilename):
     urllib.request.urlretrieve(url,fullfilename)
 
 
@@ -373,7 +366,7 @@ start_time = time.time()
 
 #print(list_url_book_categorie(URL, "Fiction"))
 
-#print(exportToCsv(URL, "Travel"))
+#print(export_to_csv(URL, "Travel"))
 
 #print((list_url_book_categorie(URL, "Travel")))
 
@@ -381,22 +374,22 @@ start_time = time.time()
 
 #print(liste_item_categories(URL))
 
-#print(extractProductDescription("http://books.toscrape.com/catalogue/starlark_56/index.html"))
+#print(extract_product_description("http://books.toscrape.com/catalogue/starlark_56/index.html"))
 
-#print(extractAllBookOfCategorie(URL, "Crime"))
+#print(extract_all_book_of_categorie(URL, "Crime"))
 
-#exportToCsv(URL, "Books")
+export_to_csv(URL, "Travel")
 
-#print(extractCategorie("http://books.toscrape.com/catalogue/starlark_56/index.html"))
+#print(extract_categorie("http://books.toscrape.com/catalogue/starlark_56/index.html"))
 
-#downloadAllPictures(URL, "Books")
+#download_all_pictures(URL, "Books")
 
 #print(list_url_book_categorie(URL, "Books"))
 
-#print(extractAllBookOfCategoriePool(URL, "Religion"))
-#print(len(extractAllBookOfCategoriePool(URL, "Religion")))
+#print(extract_all_book_of_categoriePool(URL, "Religion"))
+#print(len(extract_all_book_of_categoriePool(URL, "Religion")))
 
-downloadAllPicturesPool2(URL, "Travel")
+#download_all_pictures_pool(URL, "Travel")
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
