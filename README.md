@@ -49,17 +49,16 @@ Il s'agira simplement d'une application exécutable à la demande visant à réc
 
 ## REQUIREMENTS <a name="REQUIREMENTS"></a>
   - Pour l'exécution du programme, il est recommandé d'avoir version de Python d'au moins v3.8.X ou plus récente.
-  - Il est recommandé d'utiliser un environnement virtuel Python et d'installer les packages présent dans le fichier "requirements.txt" 
-  - une procédure vous détaillera cette installation.
+  - Il est recommandé d'utiliser un environnement virtuel Python et d'installer les packages présents dans le fichier "requirements.txt" (une procédure plus bas vous détaillera cette installation).
   - Il est recommander de récupérer le projet en utilisant "git clone" ou en téléchargeant directement le projet.
-  - Une connexion internet fonctionnelle
+  - Une connexion internet fonctionnelle est nécessaire
 
 
 ### Récupération du projet <a name="Recup_projet"></a>
 
 - Par téléchargement:
   
-lien de téléchargement : https://github.com/lahou-sys/DA_Python_P02/archive/refs/heads/main.zip
+ lien de téléchargement : https://github.com/lahou-sys/DA_Python_P02/archive/refs/heads/main.zip
 
 - Par "git clone":
   
@@ -76,7 +75,7 @@ Se positionner dans le dossier de votre choix et qui hébergera le script "p2_sc
 
 Si le module python "venv" n'est pas installé sur votre système, il est nécessaire de l'installer comme ci-dessous :
 
-    - Installation du module "venv"
+  - Installation du module "venv"
 
 ```ssh
 $ pip insatll venv
@@ -115,7 +114,7 @@ $ pip install -r requirements.txt
 
 ## Comment utiliser le script "p2_scrape.py" <a name="How_to_use"></a>
 
-Une fois l'enviroennemt virtuel Python créé et activé, ainsi que l'installation des packages nécessaires installés.
+Une fois l'environnement virtuel Python créé et activé, ainsi que l'installation des packages nécessaires installés.
 
 Vous pouvez lancer le programme "p2_scrape.py" :
 
@@ -192,12 +191,12 @@ Le script "p2_scrape.py" crééra un nouveau dossier parent horodaté lors de ch
 
 extract_YYMMJJHHmmss
 
-YY : année
-MM : mois
-JJ : jour
-HH : heure
-mm : minute
-ss : second
+- YY : année
+- MM : mois
+- JJ : jour
+- HH : heure
+- mm : minute
+- ss : second
 
 Exemple :
 
