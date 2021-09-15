@@ -34,11 +34,11 @@ def mkdir_directory(directory):
     try:
         os.mkdir(directory)
     except PermissionError:
-        print("Impossible de créer le dossier de trvail (%s)!" % (directory))
+        print(f"Impossible de créer le dossier de trvail '{directory}' !")
         print("Problème de permissions sur le dossier parent.")
         exit()
     except:
-        print("Impossible de créer le dossier de trvail (%s)!" % (directory))
+        print(f"Impossible de créer le dossier de trvail '{directory}' !")
         print("Vérifier que vous pouvez créer des dossiers et des fichiers dans le dossier contenant ce script.")
         exit()
 
@@ -69,7 +69,7 @@ def make_soup(url):
 
 	"""
     reponse = requests.get(url)
-    soup = BeautifulSoup(reponse.text, "html.parser")
+    soup = BeautifulSoup(reponse.content, "html.parser")
     return soup
 
 
@@ -79,16 +79,9 @@ def dic_categories_url(url):
 
 	"""
     soup = make_soup(url)
-    categories_liste = []
-    categories_liste_url = []
     categorie_side = soup.find("div", class_="side_categories")
     cacategories = categorie_side.findChildren("a")
-    for i in cacategories:
-        item = ((i.contents[0]).rstrip("\n")).strip()
-        categories_liste.append(item)
-        item2 = url_build(url,i)
-        categories_liste_url.append(item2)
-    dic_categories = dict(zip(categories_liste, categories_liste_url))
+    dic_categories = {((i.contents[0]).rstrip("\n")).strip():url_build(url,i) for i in cacategories }
     return dic_categories
 
 
@@ -114,7 +107,7 @@ def list_url_book_categorie(categorie, dic_cat):
         next_test = soup.find("li", class_="next")
         while next_test:
             page += 1
-            p = "page-" + str(page) + ".html"
+            p = (f"page-{page}.html")
             url_page = url_categorie.replace("index.html", p )
             soup = make_soup(url_page)
             liste_book_of_categorie= soup.find("ol", class_="row")
@@ -139,14 +132,6 @@ def extract_attributs_book(soup):
 	"""
     section = soup.find("table", attrs={"class": "table table-striped"})
     tables = section.find_all("tr")
-    """ table_header = []
-    table_data = []
-    for i in tables:
-        header = i.find("th")
-        table_header.append(header.text)
-        data_row = i.find("td")
-        table_data.append(data_row.text)
-    dic_attributs_book = dict(zip(table_header, table_data)) """
     dic_attributs_book = {(i.find("th")).text:(i.find("td")).text for i in tables}
     return dic_attributs_book
 
@@ -191,7 +176,7 @@ def extract_price_including_tax(soup):
 
 	"""
     price_including_tax = extract_attributs_book(soup)['Price (incl. tax)']
-    return price_including_tax.replace("Â", "")
+    return price_including_tax
 
 
 def extract_price_excluding_tax(soup):
@@ -200,7 +185,7 @@ def extract_price_excluding_tax(soup):
 
 	"""
     price_excluding_tax = extract_attributs_book(soup)['Price (excl. tax)']
-    return price_excluding_tax.replace("Â", "")
+    return price_excluding_tax
 
 
 def extract_number_available(soup):
@@ -219,7 +204,7 @@ def extract_product_description(soup):
 	"""
     section = soup.find("div", attrs={"id": "content_inner"})
     if section.find("p", attrs=None):
-        product_description = (section.find("p", attrs=None).text).replace(",", "")
+        product_description = (section.find("p", attrs=None).text)
         return product_description
     else:
         return None
@@ -298,10 +283,10 @@ def extract_all_book_of_categorie(categorie, dic_cat):
     liste_url_books_divise = list(chunks_liste(liste_url_books, taille_sous_liste))
     liste_books = []
     processes = []
-    for i in liste_url_books_divise:
+    for liste in liste_url_books_divise:
         with ThreadPoolExecutor(max_workers=100) as executor:
-            for j in i:
-                result = processes.append(executor.submit(extract_infos_books, j))          
+            for dic in liste:
+                result = processes.append(executor.submit(extract_infos_books, dic))          
     for task in as_completed(processes):
         liste_books.append(task.result())
     return liste_books
@@ -313,19 +298,12 @@ def export_to_csv(books,categorie):
         books : liste des dictionnaires de chaque livre
 	
 	"""
-    books = books
-    header_list = []
-    output = categorie.replace(" ", "_") + ".csv"
-    for key in books[0]:
-        header_list.append(key)
+    output = (f"{categorie.replace(' ', '_')}.csv")
     with open( output, "w", encoding="utf-8") as csvfile:
-        writer = csv.writer(csvfile, delimiter=',')
-        writer.writerow(header_list)      
+        writer = csv.DictWriter(csvfile, delimiter=',', fieldnames=books[0].keys())
+        writer.writeheader()
         for i in books:
-            liste_item = []
-            for key, value in i.items():
-                liste_item.append(value)
-            writer.writerow(liste_item)
+            writer.writerows(books)
 
 
 def download_all_pictures(categorie,books):
@@ -336,34 +314,26 @@ def download_all_pictures(categorie,books):
 	"""
     directory = "images"
     mkdir_directory(directory)
-    # books = books
     liste_books = []
-    for i in range(len(books)):
-        key_to_extract = {"universal_ product_code (upc)", "image_url"}
-        dic = books[i]
-        new_dic = {key: dic[key] for key in dic.keys() & key_to_extract}
-        new_dic = dict(sorted(new_dic.items()))
-        liste_books.append(new_dic)
+    key_extract = ["universal_ product_code (upc)", "image_url"]
+    for book in books:
+        liste_books.append({key: book[key] for key in book.keys() & key_extract })
     book_url = []
     book_fullfilename = []
-    liste_item = []
-    for j in liste_books:
-        for key in j:
-            liste_item.append(j[key])
-        name_picture = "picture_" + categorie.replace(" ", "_") +"_"+"upc-" + liste_item[1] + ".jpg"
+    for book in liste_books:
+        name_picture = (f"picture_{categorie.replace(' ', '_')}_upc-{book['universal_ product_code (upc)']}.jpg")
         fullfilename = os.path.join(directory, str(name_picture))
-        url = liste_item[0]
-        book_url.append(url)
+        book_url.append(book["image_url"])
         book_fullfilename.append(str(fullfilename))
-        liste_item = []
     threads = []
-    for u,f in zip(book_url, book_fullfilename):
-        thread = threading.Thread(target=download_picture_url, args=(u,f))
+    for url,fullfilename in zip(book_url, book_fullfilename):
+        thread = threading.Thread(target=download_picture_url, args=(url,fullfilename))
         threads.append(thread)
         thread.start()
     for i in threads:
         i.join()
-               
+
+
 
 def download_picture_url(url,fullfilename):
     """Téléchargement d'un fichier.
@@ -371,7 +341,12 @@ def download_picture_url(url,fullfilename):
         fullfilename : chemin avec le nom du fichier cible
 	
 	"""
-    urllib.request.urlretrieve(url,fullfilename)
+    try:
+        urllib.request.urlretrieve(url,fullfilename)
+    except:
+        print (f"Problème lors du téléchargement du fichier {fullfilename} ! \nConnexion impossible à l'url : \
+        {url} \n Vérifier votre connexion et relancer le traitement.")
+        exit()
 
 
 def main(url,categorie):
@@ -381,11 +356,12 @@ def main(url,categorie):
     try:
         requests.get(url)
     except requests.exceptions.ConnectionError:
-        print ("Connexion impossible à l'url : " + url + "\nVérifier votre connexion internet.")
+        print (f"Connexion impossible à l'url : {url} \nVérifier votre connexion internet.")
         exit()
     else:
+        start_time = time.time()
         home = os.getcwd()
-        directory_root = "extract" + "_" + time.strftime("%y%m%d%H%M%S")
+        directory_root = (f"extract_{time.strftime('%y%m%d%H%M%S')}")
         mkdir_directory(directory_root)
         dic_cat = dic_categories_url(url)
         os.chdir(directory_root)
@@ -394,10 +370,10 @@ def main(url,categorie):
             liste_cat.remove("Books")
             nbre_cat = len(liste_cat)
             compteur = 0
-            print("Nombre de catégorie à traiter : " + str(nbre_cat))
+            print(f"Nombre de catégorie à traiter : {nbre_cat}")
             for cat in liste_cat:
                 compteur += 1
-                print("Extraction en cours ... " + str(compteur).rjust(2) + " sur " + str(nbre_cat) + " ... Catégorie : " + cat  )
+                print(f"Extraction en cours ... {compteur:2} sur {nbre_cat} ... Catégorie : {cat}")
                 dir = cat.replace(" ", "_")
                 mkdir_directory(dir)
                 os.chdir(dir)
@@ -406,24 +382,21 @@ def main(url,categorie):
                 download_all_pictures(cat,books)
                 os.chdir("../")
         else:
-            print("Extraction en cours ... Catégorie : " + categorie)
+            print(f"Extraction en cours ... Catégorie : {categorie}")
             dir = categorie.replace(" ", "_")
             mkdir_directory(dir)
             os.chdir(dir)
             books = extract_all_book_of_categorie(categorie,dic_cat)
             export_to_csv(books,categorie)
             download_all_pictures(categorie,books)
-        print("Extraction terminée." + "\nLe dossier " + '"' + directory_root + '"' + " contient votre extraction." )
+        print(f"Extraction terminée. \nLe dossier '{directory_root}' contient les fichiers de l'extraction.")
+        print(f"Durée du traitement : --- {time.time() - start_time} seconds ---")
 
 
 # Running the script
 
-start_time = time.time()
 
 URL = "http://books.toscrape.com/"
 
 if __name__ == "__main__":
     main(URL, "ALL")
-
-
-print("Durée du traitement : --- %s seconds ---" % (time.time() - start_time))
