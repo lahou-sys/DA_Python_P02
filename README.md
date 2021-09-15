@@ -100,8 +100,8 @@ $ source ./.venv/bin/activate
 
 l'instaation de ces packages sont nécessaire pour la bonne éxécution du script.
 
-bs4==0.0.1
-requests==2.26.0
+- bs4==0.0.1
+- requests==2.26.0
 
     - Installation automatique des packages
 
