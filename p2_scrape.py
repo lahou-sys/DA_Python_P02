@@ -68,7 +68,11 @@ def make_soup(url):
         url : url de la page à extraire
 
 	"""
-    reponse = requests.get(url)
+    try:
+        reponse = requests.get(url)
+    except:
+        print (f"Problème d'accès à l'url : {url} ! \nVérifier votre connexion et relancer le traitement.")
+        os._exit(1)
     soup = BeautifulSoup(reponse.content, "html.parser")
     return soup
 
@@ -92,7 +96,6 @@ def list_url_book_categorie(categorie, dic_cat):
 
 	"""
     book_liste_url = []
-    next_page = False
     url_categorie = dic_cat[categorie]
     soup = make_soup(url_categorie)
     if not soup.find("li", class_="next"):
@@ -286,7 +289,7 @@ def extract_all_book_of_categorie(categorie, dic_cat):
     for liste in liste_url_books_divise:
         with ThreadPoolExecutor(max_workers=100) as executor:
             for dic in liste:
-                result = processes.append(executor.submit(extract_infos_books, dic))          
+                result = processes.append(executor.submit(extract_infos_books, dic))       
     for task in as_completed(processes):
         liste_books.append(task.result())
     return liste_books
@@ -358,39 +361,37 @@ def main(url,categorie):
     except requests.exceptions.ConnectionError:
         print (f"Connexion impossible à l'url : {url} \nVérifier votre connexion internet.")
         exit()
-    else:
-        start_time = time.time()
-        home = os.getcwd()
-        directory_root = (f"extract_{time.strftime('%y%m%d%H%M%S')}")
-        mkdir_directory(directory_root)
-        dic_cat = dic_categories_url(url)
-        os.chdir(directory_root)
-        if categorie == "ALL":
-            liste_cat = list(dic_cat.keys())
-            liste_cat.remove("Books")
-            nbre_cat = len(liste_cat)
-            compteur = 0
-            print(f"Nombre de catégorie à traiter : {nbre_cat}")
-            for cat in liste_cat:
-                compteur += 1
-                print(f"Extraction en cours ... {compteur:2} sur {nbre_cat} ... Catégorie : {cat}")
-                dir = cat.replace(" ", "_")
-                mkdir_directory(dir)
-                os.chdir(dir)
-                books = extract_all_book_of_categorie(cat,dic_cat)
-                export_to_csv(books,cat)
-                download_all_pictures(cat,books)
-                os.chdir("../")
-        else:
-            print(f"Extraction en cours ... Catégorie : {categorie}")
-            dir = categorie.replace(" ", "_")
+    start_time = time.time()
+    directory_root = (f"extract_{time.strftime('%y%m%d%H%M%S')}")
+    mkdir_directory(directory_root)
+    dic_cat = dic_categories_url(url)
+    os.chdir(directory_root)
+    if categorie == "ALL":
+        liste_cat = list(dic_cat.keys())
+        liste_cat.remove("Books")
+        nbre_cat = len(liste_cat)
+        compteur = 0
+        print(f"Nombre de catégorie à traiter : {nbre_cat}")
+        for cat in liste_cat:
+            compteur += 1
+            print(f"Extraction en cours ... {compteur:2} sur {nbre_cat} ... Catégorie : {cat}")
+            dir = cat.replace(" ", "_")
             mkdir_directory(dir)
             os.chdir(dir)
-            books = extract_all_book_of_categorie(categorie,dic_cat)
-            export_to_csv(books,categorie)
-            download_all_pictures(categorie,books)
-        print(f"Extraction terminée. \nLe dossier '{directory_root}' contient les fichiers de l'extraction.")
-        print(f"Durée du traitement : --- {time.time() - start_time} seconds ---")
+            books = extract_all_book_of_categorie(cat,dic_cat)
+            export_to_csv(books,cat)
+            download_all_pictures(cat,books)
+            os.chdir("../")
+    else:
+        print(f"Extraction en cours ... Catégorie : {categorie}")
+        dir = categorie.replace(" ", "_")
+        mkdir_directory(dir)
+        os.chdir(dir)
+        books = extract_all_book_of_categorie(categorie,dic_cat)
+        export_to_csv(books,categorie)
+        download_all_pictures(categorie,books)
+    print(f"Extraction terminée. \nLe dossier '{directory_root}' contient les fichiers de l'extraction.")
+    print(f"Durée du traitement : --- {time.time() - start_time} seconds ---")
 
 
 # Running the script
